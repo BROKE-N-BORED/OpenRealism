@@ -1,9 +1,10 @@
-import { world, system, EffectTypes, MinecraftEffectTypes } from "@minecraft/server";
+import { world, system } from "@minecraft/server";
 
 // Thirst constants
 const MAX_THIRST = 20;
-const THIRST_DAMAGE_THRESHOLD = 6; // Below this = damage
-const TICKS_PER_CHECK = 20; // Check every second
+const THIRST_DAMAGE_THRESHOLD = 6;
+const TICKS_PER_CHECK = 20;
+const ENVIRONMENT_CHECK_INTERVAL = 100; // Cache biome every 5 seconds to save MS/tick on mobile
 
 // Thirst decay rates (per tick)
 const DECAY_RATES = {
@@ -15,13 +16,22 @@ const DECAY_RATES = {
 
 class ThirstSystem {
     constructor() {
-        this.playerData = new Map();
+        this.playerCache = new Map(); // Store temporary data like biome multiplier
         this.setupEventListeners();
     }
 
     setupEventListeners() {
         world.afterEvents.playerSpawn.subscribe((event) => {
-            this.initializePlayer(event.player);
+            if (event.initialSpawn) {
+                this.initializePlayer(event.player);
+            }
+        });
+
+        // Reset thirst on death to avoid the death loop
+        world.afterEvents.entityDie.subscribe((event) => {
+            if (event.deadEntity.typeId === "minecraft:player") {
+                this.setThirst(event.deadEntity, MAX_THIRST);
+            }
         });
 
         world.beforeEvents.chatSend.subscribe((event) => {
@@ -32,57 +42,70 @@ class ThirstSystem {
         });
 
         system.runInterval(() => this.tick(), TICKS_PER_CHECK);
+        system.runInterval(() => this.updateEnvironmentCache(), ENVIRONMENT_CHECK_INTERVAL);
     }
 
     initializePlayer(player) {
-        if (!this.playerData.has(player.id)) {
-            this.playerData.set(player.id, {
-                thirst: MAX_THIRST,
-                isDehydrated: false
-            });
+        // Use Dynamic Properties for persistent state instead of RAM Map
+        const currentThirst = player.getDynamicProperty('or:thirst');
+        if (currentThirst === undefined) {
+            this.setThirst(player, MAX_THIRST);
+        }
+    }
+
+    updateEnvironmentCache() {
+        for (const player of world.getAllPlayers()) {
+            let envMultiplier = 0;
+            const biome = player.dimension.getBiome(player.location);
+            if (this.isHotBiome(biome)) {
+                envMultiplier += DECAY_RATES.HOT_BIOME;
+            }
+            this.playerCache.set(player.id, { envMultiplier });
         }
     }
 
     tick() {
         for (const player of world.getAllPlayers()) {
+            // Don't process dead players
+            if (!player.isValid() || player.getComponent('minecraft:health')?.currentValue <= 0) continue;
+            
             this.processThirstDecay(player);
             this.applyEffects(player);
         }
     }
 
     processThirstDecay(player) {
-        const data = this.playerData.get(player.id);
-        if (!data) return;
+        let currentThirst = player.getDynamicProperty('or:thirst');
+        if (currentThirst === undefined) return;
 
         let decay = DECAY_RATES.DEFAULT;
 
-        // Sprinting check
         if (player.isSprinting) decay += DECAY_RATES.SPRINTING;
 
-        // Hot biome check (desert, badlands, nether)
-        const biome = player.dimension.getBiome(player.location);
-        if (this.isHotBiome(biome)) decay += DECAY_RATES.HOT_BIOME;
+        const cache = this.playerCache.get(player.id);
+        if (cache) decay += cache.envMultiplier;
 
-        // Healing check (regeneration effect)
-        if (player.getEffect(MinecraftEffectTypes.regeneration)) {
+        // Modern API string identifier for effects
+        if (player.getEffect("regeneration")) {
             decay += DECAY_RATES.HEALING;
         }
 
-        data.thirst = Math.max(0, data.thirst - decay);
-        this.playerData.set(player.id, data);
+        const newThirst = Math.max(0, currentThirst - decay);
+        this.setThirst(player, newThirst);
     }
 
     isHotBiome(biome) {
+        if (!biome) return false;
         const hotBiomes = ["desert", "badlands", "nether_wastes", "soul_sand_valley", "crimson_forest", "warped_forest"];
-        return hotBiomes.includes(biome?.typeId);
+        return hotBiomes.includes(biome.id);
     }
 
     applyEffects(player) {
-        const data = this.playerData.get(player.id);
-        if (!data) return;
+        const thirst = player.getDynamicProperty('or:thirst');
+        if (thirst === undefined) return;
 
         // Dehydration damage
-        if (data.thirst <= THIRST_DAMAGE_THRESHOLD) {
+        if (thirst <= THIRST_DAMAGE_THRESHOLD) {
             player.applyDamage(1);
             player.onScreenDisplay.setTitle("§cDEHYDRATED!", {
                 stayDuration: 20,
@@ -92,23 +115,24 @@ class ThirstSystem {
         }
 
         // Slowness when thirsty
-        if (data.thirst < 10) {
-            player.addEffect(MinecraftEffectTypes.slowness, 40, { amplifier: 0 });
+        if (thirst < 10) {
+            player.addEffect("slowness", 40, { amplifier: 0 });
         }
+    }
+
+    setThirst(player, amount) {
+        player.setDynamicProperty('or:thirst', Math.max(0, Math.min(MAX_THIRST, amount)));
     }
 
     addThirst(player, amount) {
-        const data = this.playerData.get(player.id);
-        if (data) {
-            data.thirst = Math.min(MAX_THIRST, data.thirst + amount);
-            this.playerData.set(player.id, data);
-        }
+        const current = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
+        this.setThirst(player, current + amount);
     }
 
     checkThirst(player) {
-        const data = this.playerData.get(player.id);
-        if (data) {
-            player.sendMessage(`§bThirst: ${Math.floor(data.thirst)}/20`);
+        const thirst = player.getDynamicProperty('or:thirst');
+        if (thirst !== undefined) {
+            player.sendMessage(`§bThirst: ${Math.floor(thirst)}/20`);
         }
     }
 }
