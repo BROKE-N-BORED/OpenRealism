@@ -1,0 +1,22 @@
+{
+    "format_version": "1.20.10",
+    "minecraft:recipe_shaped": {
+        "description": {
+            "identifier": "openrealism:ice_pack"
+        },
+        "tags": ["crafting_table"],
+        "pattern": [
+            " P ",
+            "PIP",
+            " P "
+        ],
+        "key": {
+            "P": { "item": "minecraft:paper" },
+            "I": { "item": "minecraft:ice" }
+        },
+        "result": {
+            "item": "openrealism:ice_pack",
+            "count": 2
+        }
+    }
+}

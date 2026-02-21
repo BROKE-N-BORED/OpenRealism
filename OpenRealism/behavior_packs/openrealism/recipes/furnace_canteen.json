@@ -1,0 +1,11 @@
+{
+    "format_version": "1.20.10",
+    "minecraft:recipe_furnace": {
+        "description": {
+            "identifier": "openrealism:furnace_canteen"
+        },
+        "tags": ["furnace", "smoker", "campfire", "soul_campfire"],
+        "input": "openrealism:canteen_dirty",
+        "output": "openrealism:canteen_clean"
+    }
+}

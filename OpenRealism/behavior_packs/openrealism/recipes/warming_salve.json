@@ -1,0 +1,18 @@
+{
+    "format_version": "1.20.10",
+    "minecraft:recipe_shapeless": {
+        "description": {
+            "identifier": "openrealism:warming_salve"
+        },
+        "tags": ["crafting_table"],
+        "ingredients": [
+            { "item": "minecraft:blaze_powder" },
+            { "item": "minecraft:honey_bottle" },
+            { "item": "minecraft:slime_ball" }
+        ],
+        "result": {
+            "item": "openrealism:warming_salve",
+            "count": 2
+        }
+    }
+}

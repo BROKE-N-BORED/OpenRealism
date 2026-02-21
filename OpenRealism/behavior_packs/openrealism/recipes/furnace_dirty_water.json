@@ -1,0 +1,11 @@
+{
+    "format_version": "1.20.10",
+    "minecraft:recipe_furnace": {
+        "description": {
+            "identifier": "openrealism:furnace_dirty_water"
+        },
+        "tags": ["furnace", "smoker", "campfire", "soul_campfire"],
+        "input": "openrealism:dirty_water_bottle",
+        "output": "openrealism:boiled_water_bottle"
+    }
+}
