@@ -1,0 +1,26 @@
+{
+    "format_version": "1.20.10",
+    "minecraft:recipe_shaped": {
+        "description": {
+            "identifier": "openrealism:charcoal_filter"
+        },
+        "tags": ["crafting_table"],
+        "pattern": [
+            " P ",
+            "C C",
+            " P "
+        ],
+        "key": {
+            "P": {
+                "item": "minecraft:paper"
+            },
+            "C": {
+                "item": "minecraft:charcoal"
+            }
+        },
+        "result": {
+            "item": "openrealism:charcoal_filter",
+            "count": 2
+        }
+    }
+}

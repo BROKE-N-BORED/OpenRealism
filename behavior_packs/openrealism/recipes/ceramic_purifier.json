@@ -1,0 +1,25 @@
+{
+    "format_version": "1.20.10",
+    "minecraft:recipe_shaped": {
+        "description": {
+            "identifier": "openrealism:ceramic_purifier"
+        },
+        "tags": ["crafting_table"],
+        "pattern": [
+            "CCC",
+            "CFC",
+            "CCC"
+        ],
+        "key": {
+            "C": {
+                "item": "minecraft:brick"
+            },
+            "F": {
+                "item": "openrealism:charcoal_filter"
+            }
+        },
+        "result": {
+            "item": "openrealism:ceramic_purifier"
+        }
+    }
+}

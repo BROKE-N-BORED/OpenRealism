@@ -1,0 +1,25 @@
+{
+    "format_version": "1.20.10",
+    "minecraft:recipe_shaped": {
+        "description": {
+            "identifier": "openrealism:copper_distiller"
+        },
+        "tags": ["crafting_table"],
+        "pattern": [
+            "C C",
+            "CBC",
+            "CCC"
+        ],
+        "key": {
+            "C": {
+                "item": "minecraft:copper_ingot"
+            },
+            "B": {
+                "item": "minecraft:bucket"
+            }
+        },
+        "result": {
+            "item": "openrealism:copper_distiller"
+        }
+    }
+}
