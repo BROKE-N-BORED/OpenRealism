@@ -1,12 +1,10 @@
 import { world, system } from "@minecraft/server";
 
-// Thirst constants
 const MAX_THIRST = 20;
 const THIRST_DAMAGE_THRESHOLD = 6;
 const TICKS_PER_CHECK = 20;
-const ENVIRONMENT_CHECK_INTERVAL = 100; // Cache biome every 5 seconds to save MS/tick on mobile
+const ENVIRONMENT_CHECK_INTERVAL = 100;
 
-// Thirst decay rates (per tick)
 const DECAY_RATES = {
     DEFAULT: 0.001,
     SPRINTING: 0.003,
@@ -16,7 +14,7 @@ const DECAY_RATES = {
 
 class ThirstSystem {
     constructor() {
-        this.playerCache = new Map(); // Store temporary data like biome multiplier
+        this.playerCache = new Map();
         this.setupEventListeners();
     }
 
@@ -27,7 +25,6 @@ class ThirstSystem {
             }
         });
 
-        // Reset thirst on death to avoid the death loop
         world.afterEvents.entityDie.subscribe((event) => {
             if (event.deadEntity.typeId === "minecraft:player") {
                 this.setThirst(event.deadEntity, MAX_THIRST);
@@ -46,7 +43,6 @@ class ThirstSystem {
     }
 
     initializePlayer(player) {
-        // Use Dynamic Properties for persistent state instead of RAM Map
         const currentThirst = player.getDynamicProperty('or:thirst');
         if (currentThirst === undefined) {
             this.setThirst(player, MAX_THIRST);
@@ -66,7 +62,6 @@ class ThirstSystem {
 
     tick() {
         for (const player of world.getAllPlayers()) {
-            // Don't process dead players
             if (!player.isValid() || player.getComponent('minecraft:health')?.currentValue <= 0) continue;
             
             this.processThirstDecay(player);
@@ -75,8 +70,7 @@ class ThirstSystem {
     }
 
     processThirstDecay(player) {
-        let currentThirst = player.getDynamicProperty('or:thirst');
-        if (currentThirst === undefined) return;
+        let currentThirst = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
 
         let decay = DECAY_RATES.DEFAULT;
 
@@ -85,7 +79,6 @@ class ThirstSystem {
         const cache = this.playerCache.get(player.id);
         if (cache) decay += cache.envMultiplier;
 
-        // Modern API string identifier for effects
         if (player.getEffect("regeneration")) {
             decay += DECAY_RATES.HEALING;
         }
@@ -101,10 +94,8 @@ class ThirstSystem {
     }
 
     applyEffects(player) {
-        const thirst = player.getDynamicProperty('or:thirst');
-        if (thirst === undefined) return;
+        const thirst = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
 
-        // Dehydration damage
         if (thirst <= THIRST_DAMAGE_THRESHOLD) {
             player.applyDamage(1);
             player.onScreenDisplay.setTitle("§cDEHYDRATED!", {
@@ -114,7 +105,6 @@ class ThirstSystem {
             });
         }
 
-        // Slowness when thirsty
         if (thirst < 10) {
             player.addEffect("slowness", 40, { amplifier: 0 });
         }
@@ -130,10 +120,8 @@ class ThirstSystem {
     }
 
     checkThirst(player) {
-        const thirst = player.getDynamicProperty('or:thirst');
-        if (thirst !== undefined) {
-            player.sendMessage(`§bThirst: ${Math.floor(thirst)}/20`);
-        }
+        const thirst = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
+        player.sendMessage(`§bThirst: ${Math.floor(thirst)}/20`);
     }
 }
 
