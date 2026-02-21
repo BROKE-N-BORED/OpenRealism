@@ -12,8 +12,8 @@
         ],
         "key": {
             "I": { "item": "minecraft:iron_ingot" },
-            "L": { "item": "minecraft:leather" },
-            "B": { "item": "minecraft:iron_boots" }
+            "L": { "item": "minecraft:dagger" },
+            "B": { "item": "minecraft:leather_boots" }
         },
         "result": {
             "item": "openrealism:ice_skates"
