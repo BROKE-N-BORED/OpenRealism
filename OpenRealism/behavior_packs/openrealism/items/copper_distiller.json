@@ -11,12 +11,12 @@
                 "block": "openrealism:copper_distiller_block"
             },
             "minecraft:display_name": {
-                "value": "Copper Distiller"
+                "value": "Copper Water Distiller"
             },
             "minecraft:lore": [
-                "§7Advanced purification system",
-                "§7Produces clean water and salt",
-                "§7Requires heat source (campfire/lava)"
+                "§7Most efficient water purifier",
+                "§7Needs heat source underneath campfire",
+                "§7Produces boiled water"
             ]
         }
     }

@@ -7,35 +7,35 @@
         },
         "components": {
             "minecraft:max_stack_size": 1,
+            "minecraft:hand_equipped": true,
             "minecraft:use_duration": 1.6,
+            "minecraft:display_name": {
+                "value": "Bottle of Dirty Water"
+            },
+            "minecraft:lore": [
+                "§cUnsafe to drink!",
+                "§7Drinking may cause illness"
+            ],
             "minecraft:food": {
                 "nutrition": 0,
                 "saturation_modifier": "poor",
                 "can_always_eat": true,
                 "effects": [
                     {
-                        "name": "poison",
-                        "chance": 0.6,
-                        "duration": 600,
-                        "amplifier": 0
+                        "name": "nausea",
+                        "chance": 0.8,
+                        "duration": 20,
+                        "amplifier": 1
                     },
                     {
-                        "name": "nausea",
-                        "chance": 0.3,
-                        "duration": 200,
+                        "name": "poison",
+                        "chance": 0.5,
+                        "duration": 10,
                         "amplifier": 0
                     }
                 ]
             },
-            "minecraft:use_animation": "drink",
-            "minecraft:display_name": {
-                "value": "Dirty Water Bottle"
-            },
-            "minecraft:lore": [
-                "§c§lCONTAMINATED",
-                "§760% chance of poisoning",
-                "§7Use purification methods"
-            ]
+            "minecraft:use_animation": "drink"
         }
     }
 }

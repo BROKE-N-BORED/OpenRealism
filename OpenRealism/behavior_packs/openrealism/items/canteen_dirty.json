@@ -2,7 +2,7 @@
     "format_version": "1.20.50",
     "minecraft:item": {
         "description": {
-            "identifier": "openrealism:purified_water_bottle",
+            "identifier": "openrealism:canteen_dirty",
             "category": "equipment"
         },
         "components": {
@@ -10,17 +10,12 @@
             "minecraft:hand_equipped": true,
             "minecraft:use_duration": 1.6,
             "minecraft:display_name": {
-                "value": "Bottle of Purified Water"
+                "value": "Canteen (Dirty)"
             },
             "minecraft:lore": [
-                "§aSafe to drink",
-                "§7Filtered water"
+                "§cUnsafe to drink!",
+                "§744 Uses remaining"
             ],
-            "minecraft:food": {
-                "nutrition": 0,
-                "saturation_modifier": "poor",
-                "can_always_eat": true
-            },
             "minecraft:use_animation": "drink"
         }
     }

@@ -2,22 +2,29 @@
     "format_version": "1.20.50",
     "minecraft:item": {
         "description": {
-            "identifier": "openrealism:canteen",
+            "identifier": "openrealism:boiled_water_bottle",
             "category": "equipment"
         },
         "components": {
             "minecraft:max_stack_size": 1,
             "minecraft:hand_equipped": true,
             "minecraft:use_duration": 1.6,
+            "minecraft:display_name": {
+                "value": "Bottle of Boiled Water"
+            },
+            "minecraft:lore": [
+                "§aSafe to drink",
+                "§7Slightly warms you up"
+            ],
             "minecraft:food": {
                 "nutrition": 0,
                 "saturation_modifier": "poor",
                 "can_always_eat": true,
                 "effects": [
                     {
-                        "name": "water_breathing",
-                        "chance": 0.0,
-                        "duration": 0,
+                        "name": "regeneration",
+                        "chance": 0.3,
+                        "duration": 5,
                         "amplifier": 0
                     }
                 ]
