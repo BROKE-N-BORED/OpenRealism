@@ -1,0 +1,26 @@
+# Build outputs
+*.mcpack
+*.mcaddon
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+logs/
+*.log
+
+# Node modules
+node_modules/
