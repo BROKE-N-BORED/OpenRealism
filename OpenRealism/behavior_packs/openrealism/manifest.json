@@ -1,0 +1,31 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "OpenRealism Behavior Pack - Core survival mechanics and systems",
+        "name": "OpenRealism BP",
+        "uuid": "7a35f5f0-6a77-4a0b-99d8-c1f3c3a4f661",
+        "version": [1, 0, 0],
+        "min_engine_version": [1, 20, 50]
+    },
+    "modules": [
+        {
+            "description": "OpenRealism Scripts",
+            "type": "script",
+            "uuid": "4c52f8c0-3b47-49f3-8022-f19b26b38c20",
+            "version": [1, 0, 0],
+            "entry": "scripts/main.js"
+        },
+        {
+            "description": "OpenRealism Data",
+            "type": "data",
+            "uuid": "88bb8b83-e186-4e58-8547-2e1a3c61b238",
+            "version": [1, 0, 0]
+        }
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.8.0"
+        }
+    ]
+}
