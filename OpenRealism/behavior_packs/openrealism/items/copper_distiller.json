@@ -1,0 +1,23 @@
+{
+    "format_version": "1.20.50",
+    "minecraft:item": {
+        "description": {
+            "identifier": "openrealism:copper_distiller",
+            "category": "construction"
+        },
+        "components": {
+            "minecraft:max_stack_size": 1,
+            "minecraft:block_placer": {
+                "block": "openrealism:copper_distiller_block"
+            },
+            "minecraft:display_name": {
+                "value": "Copper Distiller"
+            },
+            "minecraft:lore": [
+                "§7Advanced purification system",
+                "§7Produces clean water and salt",
+                "§7Requires heat source (campfire/lava)"
+            ]
+        }
+    }
+}
