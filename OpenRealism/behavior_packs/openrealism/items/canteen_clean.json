@@ -1,0 +1,8 @@
+{
+    "format_version": "1.20.50",
+    "minecraft:item": {
+        "description": {
+            "identifier": "openrealism:canteen_clean"
+        }
+    }
+}
