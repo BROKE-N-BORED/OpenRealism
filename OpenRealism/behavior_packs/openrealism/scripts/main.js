@@ -1,20 +1,27 @@
-import { world } from "@minecraft/server";
-import { thirstSystem } from "./systems/thirstSystem.js";
+// Imports from systems
+// Note: Actual paths need to be correctly relative to main.js
+import { world, system } from "@minecraft/server";
+// import { ThirstSystem } from "./systems/thirstSystem.js";
+// import { TemperatureSystem } from "./systems/temperatureSystem.js";
+// import { EnvironmentTracker } from "./systems/environmentTracker.js";
+// import { WaterPurificationSystem } from "./systems/waterPurificationSystem.js";
+// import { ClimateManager } from "./systems/climateManager.js";
 
-// Register Dynamic Properties using v1.8.0+ syntax
-world.afterEvents.worldInitialize.subscribe((event) => {
-    try {
-        const propertyRegistry = event.propertyRegistry;
-        propertyRegistry.registerEntityTypeDynamicProperties("minecraft:player", [
-            {
-                identifier: "or:thirst",
-                type: "number"
-            }
-        ]);
-        console.warn("[OpenRealism] Dynamic properties registered successfully.");
-    } catch (e) {
-        console.error("[OpenRealism] Failed to register dynamic properties: " + e);
-    }
+// Initialize Systems
+system.run(() => {
+    // We instantiate them globally here
+    // globalThis.climateManager = new ClimateManager();
+    // globalThis.temperatureSystem = new TemperatureSystem();
+    // globalThis.thirstSystem = new ThirstSystem();
+    // globalThis.envTracker = new EnvironmentTracker();
+    // globalThis.waterPurifier = new WaterPurificationSystem();
+    
+    console.warn("[OpenRealism] All survival systems initialized!");
 });
 
-console.warn("[OpenRealism] Systems initialized.");
+// Generic Item consumption listener for things that don't fit perfectly in single systems
+world.afterEvents.itemUse.subscribe((event) => {
+    if (event.itemStack.typeId.includes("water")) {
+        // Handle water consumption
+    }
+});

@@ -1,128 +1,56 @@
-import { world, system } from "@minecraft/server";
+// Add to the ThirstSystem class:
 
-const MAX_THIRST = 20;
-const THIRST_DAMAGE_THRESHOLD = 6;
-const TICKS_PER_CHECK = 20;
-const ENVIRONMENT_CHECK_INTERVAL = 100;
+processWaterConsumption(player, itemType) {
+    const data = this.playerData.get(player.id);
+    if (!data) return;
 
-const DECAY_RATES = {
-    DEFAULT: 0.001,
-    SPRINTING: 0.003,
-    HOT_BIOME: 0.002,
-    HEALING: 0.005
-};
+    let quality = this.getWaterQuality(itemType);
+    let amount = 0;
 
-class ThirstSystem {
-    constructor() {
-        this.playerCache = new Map();
-        this.setupEventListeners();
-    }
-
-    setupEventListeners() {
-        world.afterEvents.playerSpawn.subscribe((event) => {
-            if (event.initialSpawn) {
-                this.initializePlayer(event.player);
+    switch (quality) {
+        case WATER_QUALITY.DIRTY:
+            amount = 4;
+            // High risk of illness
+            if (Math.random() < 0.8) {
+                player.addEffect(MinecraftEffectTypes.nausea, 20 * 20, { amplifier: 1 });
             }
-        });
-
-        world.afterEvents.entityDie.subscribe((event) => {
-            if (event.deadEntity.typeId === "minecraft:player") {
-                this.setThirst(event.deadEntity, MAX_THIRST);
+            if (Math.random() < 0.5) {
+                player.addEffect(MinecraftEffectTypes.poison, 10 * 20, { amplifier: 0 });
+                player.sendMessage("§cYou drank contaminated water and feel sick...");
             }
-        });
-
-        world.beforeEvents.chatSend.subscribe((event) => {
-            if (event.message === "!thirst") {
-                this.checkThirst(event.sender);
-                event.cancel = true;
-            }
-        });
-
-        system.runInterval(() => this.tick(), TICKS_PER_CHECK);
-        system.runInterval(() => this.updateEnvironmentCache(), ENVIRONMENT_CHECK_INTERVAL);
-    }
-
-    initializePlayer(player) {
-        const currentThirst = player.getDynamicProperty('or:thirst');
-        if (currentThirst === undefined) {
-            this.setThirst(player, MAX_THIRST);
-        }
-    }
-
-    updateEnvironmentCache() {
-        for (const player of world.getAllPlayers()) {
-            let envMultiplier = 0;
-            const biome = player.dimension.getBiome(player.location);
-            if (this.isHotBiome(biome)) {
-                envMultiplier += DECAY_RATES.HOT_BIOME;
-            }
-            this.playerCache.set(player.id, { envMultiplier });
-        }
-    }
-
-    tick() {
-        for (const player of world.getAllPlayers()) {
-            if (!player.isValid() || player.getComponent('minecraft:health')?.currentValue <= 0) continue;
+            break;
             
-            this.processThirstDecay(player);
-            this.applyEffects(player);
-        }
+        case WATER_QUALITY.PURIFIED:
+            amount = 6;
+            // Safe, simple rehydration
+            player.sendMessage("§aRefreshing purified water.");
+            break;
+            
+        case WATER_QUALITY.BOILED:
+            amount = 6;
+            // Safe, slightly warms the player
+            player.sendMessage("§aWarm boiled water.");
+            // Apply slight regen
+            player.addEffect(MinecraftEffectTypes.regeneration, 5 * 20, { amplifier: 0 });
+            // Apply warmth (Integration with Temperature System later)
+            // if (temperatureSystem) temperatureSystem.addWarmth(player, 2.0);
+            break;
+            
+        case WATER_QUALITY.DISTILLED:
+            amount = 8;
+            // Best quality, extra hydration
+            player.sendMessage("§bPure distilled water.");
+            // if (temperatureSystem) temperatureSystem.addWarmth(player, 1.0);
+            break;
     }
 
-    processThirstDecay(player) {
-        let currentThirst = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
-
-        let decay = DECAY_RATES.DEFAULT;
-
-        if (player.isSprinting) decay += DECAY_RATES.SPRINTING;
-
-        const cache = this.playerCache.get(player.id);
-        if (cache) decay += cache.envMultiplier;
-
-        if (player.getEffect("regeneration")) {
-            decay += DECAY_RATES.HEALING;
-        }
-
-        const newThirst = Math.max(0, currentThirst - decay);
-        this.setThirst(player, newThirst);
-    }
-
-    isHotBiome(biome) {
-        if (!biome) return false;
-        const hotBiomes = ["desert", "badlands", "nether_wastes", "soul_sand_valley", "crimson_forest", "warped_forest"];
-        return hotBiomes.includes(biome.id);
-    }
-
-    applyEffects(player) {
-        const thirst = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
-
-        if (thirst <= THIRST_DAMAGE_THRESHOLD) {
-            player.applyDamage(1);
-            player.onScreenDisplay.setTitle("§cDEHYDRATED!", {
-                stayDuration: 20,
-                fadeInDuration: 5,
-                fadeOutDuration: 5
-            });
-        }
-
-        if (thirst < 10) {
-            player.addEffect("slowness", 40, { amplifier: 0 });
-        }
-    }
-
-    setThirst(player, amount) {
-        player.setDynamicProperty('or:thirst', Math.max(0, Math.min(MAX_THIRST, amount)));
-    }
-
-    addThirst(player, amount) {
-        const current = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
-        this.setThirst(player, current + amount);
-    }
-
-    checkThirst(player) {
-        const thirst = player.getDynamicProperty('or:thirst') ?? MAX_THIRST;
-        player.sendMessage(`§bThirst: ${Math.floor(thirst)}/20`);
-    }
+    this.addThirst(player, amount);
 }
 
-export const thirstSystem = new ThirstSystem();
+getWaterQuality(itemType) {
+    if (itemType.includes("dirty")) return WATER_QUALITY.DIRTY;
+    if (itemType.includes("purified") || itemType.includes("canteen_clean")) return WATER_QUALITY.PURIFIED;
+    if (itemType.includes("boiled")) return WATER_QUALITY.BOILED;
+    if (itemType.includes("distilled")) return WATER_QUALITY.DISTILLED;
+    return WATER_QUALITY.DIRTY;
+}
